@@ -1,0 +1,840 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+\usepackage[T1]{fontenc}
+
+\usepackage[tracking]{microtype}
+
+\usepackage[sc,osf]{mathpazo}   % With old-style figures and real smallcaps.
+\linespread{1.5}              % Palatino leads a little more leading
+
+% Euler for math and numbers
+% \usepackage[euler-digits,small]{eulervm}
+\usepackage{eulervm}
+\usepackage{hyperref}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{math}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows}
+\usetikzlibrary{shapes}
+\end_preamble
+\use_default_options true
+\begin_modules
+theorems-ams-bytype
+theorems-ams-extended-bytype
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding utf8
+\fontencoding default
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing onehalf
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 0
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 0
+\use_package mhchem 0
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine natbib
+\cite_engine_type authoryear
+\biblio_style \use_bibtopic false
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2.5cm
+\topmargin 3cm
+\rightmargin 2.5cm
+\bottommargin 3cm
+\footskip 1cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Random Subset Majority Voting
+\end_layout
+
+\begin_layout Author
+Anthony Lee Zhang
+\end_layout
+
+\begin_layout Date
+August 21, 2021
+\end_layout
+
+\begin_layout Section
+Parable
+\end_layout
+
+\begin_layout Standard
+There was once a family of five: Amy, Bob, Carol, Darren, and Emily.
+ Every night, the family would have to decide what to order for dinner.
+ They decided to do this using the following mechanism: they would go down
+ the restaurant, and vote for each restaurant.
+ They would only order from a restaurant if it got at least 3 out of 5 votes.
+ 
+\end_layout
+
+\begin_layout Standard
+The family quickly realized that this mechanism split the set of restaurants
+ into two groups: restuarants which would pass the vote, and restaurants
+ that wouldn't.
+ This was disappointing to many, as many members' favorite restaurants were
+ in the latter category! Strongly liked by some, but sufficiently disliked
+ by others that they would never pass the vote.
+ Moreover, everyone started to get bored of the handful of restaurants that
+ would always pass.
+ 
+\end_layout
+
+\begin_layout Standard
+The family thus decided to try a new dinner-choice mechanism.
+ Every night, three out of five people would be randomly chosen to decide
+ dinner.
+ The dinner restaurant would then only have to get two out of three votes.
+\end_layout
+
+\begin_layout Standard
+This dramatically expanded the set of restaurants that could be ordered
+ from, because occasionally, the 3 voting people could impose their preferences
+ on the other 2.
+ People sometimes had to put up with stuff they didn't like, but this was
+ outweighted by higher variety, and being able to have the stuff they did
+ like.
+ The handful of restaurants that always passed were still ordered most often,
+ but there was some chance that other stuff passed the vote also.
+ This mechanism was also obviously still fair, and respected everyone's
+ preferences on average.
+ And thus, through the power of market design, everyone lived happily ever
+ after.
+ 
+\end_layout
+
+\begin_layout Section
+Setup
+\end_layout
+
+\begin_layout Standard
+Suppose you run a DAO, or some other form of club, with a large number of
+ members (which we'll model as a continuum).
+ Club members need to vote on whether to admit new applicants to the club.
+ We'll construct a simple model of members' preferences, applicants' types,
+ and how different voting rules affect which applicants are likely to get
+ admitted to the club.
+ 
+\end_layout
+
+\begin_layout Standard
+Each club member 
+\begin_inset Formula $i$
+\end_inset
+
+ has a ``type'' 
+\begin_inset Formula $t_{i}$
+\end_inset
+
+, which can be thought of as a measure of ``preferences'' of some sort.
+ For example, high vs low 
+\begin_inset Formula $t_{i}$
+\end_inset
+
+'s might represent:
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Politics: 
+\series default
+Republicans vs democrats.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Aesthetics:
+\series default
+ Rock vs EDM fans.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Beliefs: 
+\series default
+BTC vs ETH maxi-ness.
+\end_layout
+
+\begin_layout Standard
+People with extreme positive or negative values of 
+\begin_inset Formula $t_{i}$
+\end_inset
+
+ hold strong views, people with values of 
+\begin_inset Formula $t_{i}$
+\end_inset
+
+ close to 0 are close to neutral.
+ To simplify the math, we'll assume that 
+\begin_inset Formula $t_{i}$
+\end_inset
+
+ is distributed standard normally, with mean 0 and SD 1.
+ 
+\end_layout
+
+\begin_layout Standard
+New applicants try to apply to the club, and existing members need to vote
+ whether to admit new applicants.
+ We assume that existing members have a simple utility function: members
+ want to hang out with people similar to them.
+ Thus, a member with type 
+\begin_inset Formula $t_{i}$
+\end_inset
+
+ has positive utility for admitting a new applicant with type 
+\begin_inset Formula $t_{j}$
+\end_inset
+
+, if 
+\begin_inset Formula $t_{j}$
+\end_inset
+
+ is within 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ of 
+\begin_inset Formula $i$
+\end_inset
+
+'s type:
+\begin_inset Formula 
+\[
+\left|t_{j}-t_{i}\right|\leq\Delta
+\]
+
+\end_inset
+
+For example, if 
+\begin_inset Formula $\Delta=0.3$
+\end_inset
+
+, then a moderate Republican with 
+\begin_inset Formula $t_{i}=0.4$
+\end_inset
+
+ would vote to admit anyone with 
+\begin_inset Formula $t_{j}$
+\end_inset
+
+ above 0.1, or below 0.7, but would try to vote down anyone more extreme in
+ either direction.
+ 
+\end_layout
+
+\begin_layout Standard
+We introduce the problem as voting for ``new applicants'', but the model
+ could equally well be interpreted as voting over some kind of decision.
+ For example:
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Politics:
+\series default
+ 
+\begin_inset Formula $j$
+\end_inset
+
+'s could instead represent policy proposals.
+ A moderate Republican voter with 
+\begin_inset Formula $t=0.4$
+\end_inset
+
+ would vote for any moderately republican policies, with 
+\begin_inset Formula $t_{j}$
+\end_inset
+
+ in 
+\begin_inset Formula $\left[0.1,0.7\right]$
+\end_inset
+
+, but not for democratic policies, or extreme right-wing policies.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Aesthetics: 
+\series default
+
+\begin_inset Formula $i$
+\end_inset
+
+'s might control certification for, for example, a virtual art gallery.
+ Effectively, the members judge whether a piece of music/art/etc is ``worthy''
+ of certification by the group.
+ A moderate EDM-oriented voter with 
+\begin_inset Formula $t=0.4$
+\end_inset
+
+ might vote down all rock, but be comfortable with some rock-influenced
+ EDM (
+\begin_inset Formula $t=0.1$
+\end_inset
+
+), and in the other direction would also vote down any over-technical EDM
+ 
+\begin_inset Formula $\left(t>0.7\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Beliefs: 
+\series default
+A moderate BTC maxi votes in favor of anything close to her views, as above.
+\end_layout
+
+\begin_layout Standard
+The question we want to study is how different voting mechanisms affect
+ which members get voted into the club.
+ 
+\end_layout
+
+\begin_layout Section
+Simple majority voting
+\end_layout
+
+\begin_layout Standard
+First, let's analyze the simplest possible mechanism: the whole club votes
+ on any new applicant.
+ The next plot shows the probability that a new member with type 
+\begin_inset Formula $t_{j}$
+\end_inset
+
+ can successfully join, as a function of 
+\begin_inset Formula $t_{j}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename plots/full_50.png
+	lyxscale 30
+	width 40page%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Notice that this is a rectangle! Everyone with moderate types, above around
+ -0.93 and below around 0.93, always gets in the club.
+ Anyone with 
+\begin_inset Formula $t_{j}$
+\end_inset
+
+ even 
+\emph on
+slightly 
+\emph default
+higher than the cutoff has 
+\emph on
+no
+\emph default
+ chance of getting in.
+ Why is this? The reason is that, with a lot of people, simple majority
+ voting has 
+\emph on
+no uncertainty.
+ 
+\emph default
+Right above the cutoff, agents have just above 50% of votes, and 
+\emph on
+just
+\emph default
+ make it in.
+ Right below the cutoff, they'll never make it in.
+ 
+\end_layout
+
+\begin_layout Standard
+This seems like a very non-smooth way to make decisions about who to admit.
+ Also, the set of members admitted has a ``bias towards the middle''.
+ Since you need to be acceptable to a majority of the club to get in, extreme
+ types will have literally no chance to ever make it in.
+ Ironically, there are people in the club, who would never make it in, if
+ they had to apply under majority voting.
+ 
+\end_layout
+
+\begin_layout Standard
+How might we fix this? One guess might be to relax the majority voting threshold.
+ The next plot shows how admission probabilities change when we lower the
+ threshold: say, if we need only 30% or 10% of voters to vote in favor to
+ join the club.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename plots/full_20.png
+	lyxscale 30
+	width 20page%
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename plots/full_35.png
+	lyxscale 30
+	width 20page%
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename plots/full_50.png
+	lyxscale 30
+	width 20page%
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename plots/full_65.png
+	lyxscale 30
+	width 20page%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When the threshold is lower, more types join.
+ But the admission probability plot is still a rectangle! It's still the
+ case that you're either just above the cutoff, or just below.
+ We've succeeded in making admissions more permissive: but the cost is that
+ extreme applicants close to the cutoffs, who are unacceptable to many existing
+ applicants, have just as high a chance
+\emph on
+ 
+\emph default
+of getting in as moderate applicants!
+\end_layout
+
+\begin_layout Standard
+A simple question: is there any voting rule, which:
+\end_layout
+
+\begin_layout Itemize
+Gives any type of applicants a chance to get in, but,
+\end_layout
+
+\begin_layout Itemize
+Gives 
+\emph on
+higher chances
+\emph default
+ of getting in, to applicants who are acceptable to more of the existing
+ club members?
+\end_layout
+
+\begin_layout Standard
+We'll introduce a mechanism which accomplishes this: 
+\emph on
+random subset majority voting.
+\end_layout
+
+\begin_layout Section
+Random subset majority voting (RSMV)
+\end_layout
+
+\begin_layout Standard
+Suppose, instead of 
+\emph on
+everyone
+\emph default
+ voting, we decide on admissions as follows.
+ For each applicant, a random odd-numbered set of 
+\begin_inset Formula $N$
+\end_inset
+
+ club members is selected, and they vote on whether the applicant is admitted.
+ The next plot shows the acceptance probability curve.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename plots/sub_5.png
+	lyxscale 30
+	width 40page%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We've eliminated the rectangle! Now we have a nice, smooth curve.
+ Intuitively, what is going here is that, under RSMV, 
+\emph on
+everyone 
+\emph default
+has a chance of getting admitted: even for applicants with very high 
+\begin_inset Formula $t_{j}$
+\end_inset
+
+'s, it's possible they'll get lucky and get a set of voters with high 
+\begin_inset Formula $t_{i}$
+\end_inset
+
+'s, and thus get in.
+ But applicants with 
+\begin_inset Formula $t_{j}$
+\end_inset
+
+ closer to the median of club members will be 
+\emph on
+more likely
+\emph default
+ to get admitted, because they're acceptable to more club members, so it's
+ more likely they'll get a set of voters that vote in their favor.
+ Quantitatively, under these parameter settings, an applicant who's right
+ in the middle, 
+\begin_inset Formula $t_{j}=0$
+\end_inset
+
+, has a very high 76.3% chance of admission, since most subsets will vote
+ in their favor.
+ An applicant with 
+\begin_inset Formula $t=1$
+\end_inset
+
+, more extreme than 84% of club members, still has a 47.2% chance of admission.
+ An applicant with 
+\begin_inset Formula $t=2$
+\end_inset
+
+, more extreme than 97% of members, has a positive, but much lower – 6.5%
+ – chance of admission.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Varying the parameters.
+ 
+\series default
+We can also play around with the size of the subset 
+\begin_inset Formula $N$
+\end_inset
+
+.
+ The next plot below shows how admissions probabilities change as we vary
+ 
+\begin_inset Formula $N$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename plots/sub_multi.png
+	lyxscale 30
+	width 60page%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When 
+\begin_inset Formula $N$
+\end_inset
+
+ is bigger, the curve puts more weight in the middle and less at the extremes.
+ Intuitively, the bigger 
+\begin_inset Formula $N$
+\end_inset
+
+ is, the more conservative decisions are: it's more likely that the subset
+ is representative of the club as a whole, so less likely that extreme-type
+ applicants make it into the club.
+ As 
+\begin_inset Formula $N$
+\end_inset
+
+ becomes very large, everyone in the club votes, so we approach the rectangle
+ in the first figure.
+\end_layout
+
+\begin_layout Standard
+Hence, this note makes a simple point: 
+\emph on
+random subset majority voting
+\emph default
+ is a simple mechanism that, in some cases, makes ``better behaved'' decisions
+ than simple majority voting.
+ RSMV admits applicants probabilistically, depending basically on how close
+ the applicants are to the preferences of group members.
+ No one gets in for sure, but applicants acceptable to more group members
+ have higher likelihood of being admitted.
+ This is a mechanism which allows groups to do some exploration, while also
+ ensuring that admissions decisions are ``fair'' and reflect equally the
+ preferences of all existing group members on average.
+\end_layout
+
+\begin_layout Section
+Random subset voting in practice
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Art contest judging.
+ 
+\series default
+Similarly, art, music, and other contests tend to be judged by a relatively
+ small number of judges.
+ This might be motivated mostly by logistics: it's infeasible to get the
+ universe of qualified judges together for any given event.
+ But this paper points out an interesting advantage of this mechanism: we
+ get some randomness in who wins contests, while preserving the tastes of
+ the field on average.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Academic peer review.
+ 
+\series default
+In academic peer review, papers are generally sent pseudo-randomly to a
+ small number of referees, who decide whether the paper should be published
+ or note.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Random examiner oral exams.
+ 
+\series default
+Again probably motivated mostly by logistical considerations, oral exams
+ in various fields seem to generally have a small number of randomly selected
+ judges.
+\end_layout
+
+\begin_layout Standard
+In all of these settings, random subset majority voting is used.
+ It's probably motivated mostly by logistical considerations: it's too costly
+ to get everyone to vote on every possible policy/artwork/applicant/etc.
+ But this paper suggests there's an additional benefit, that RSMV seems
+ to make acceptance decisions in a ``saner'' way than simple full-sample
+ majority.
+\end_layout
+
+\end_body
+\end_document
