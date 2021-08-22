@@ -1,4 +1,8 @@
 
+library(data.table)
+library(ggplot2)
+library(scales)
+
 reprow = function(x,n){
   matrix(rep(x,each=n),nrow=n)
 }
