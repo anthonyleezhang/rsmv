@@ -112,6 +112,28 @@ Random Subset Majority Voting
 
 \begin_layout Author
 Anthony Lee Zhang
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+anthony.zhang@chicagobooth.edu.
+ Thanks to Kelvin Santos, Wanran Zhao, and Tina Zhen for comments.
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+@_Deconsecrated_, Maya Zehavi
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Date
@@ -542,20 +564,24 @@ end{center}
 \end_layout
 
 \begin_layout Standard
-When the threshold is lower, more types join.
+When the threshold is lower, the rectangle is wider: more extreme types
+ are able to join the club, because they only need the support of, say,
+ 20% or 35% of club members.
  But the admission probability plot is still a rectangle! It's still the
- case that you're either just above the cutoff, or just below.
+ case that every agent is either just above the cutoff where they get, say,
+ 35% of votes, or just below.
  We've succeeded in making admissions more permissive: but the cost is that
  extreme applicants close to the cutoffs, who are unacceptable to many existing
  applicants, have just as high a chance
 \emph on
  
 \emph default
-of getting in as moderate applicants!
+of getting in as very moderate applicants, who are acceptable to almost
+ everyone.
 \end_layout
 
 \begin_layout Standard
-A simple question: is there any voting rule, which:
+Our question, then: is there any voting rule, which:
 \end_layout
 
 \begin_layout Itemize
@@ -834,6 +860,81 @@ In all of these settings, random subset majority voting is used.
  But this paper suggests there's an additional benefit, that RSMV seems
  to make acceptance decisions in a ``saner'' way than simple full-sample
  majority.
+\end_layout
+
+\begin_layout Section
+Implementation details, etc.
+ 
+\end_layout
+
+\begin_layout Itemize
+Kelvin Santos pointed out that, since admission is random, applicants could
+ simply apply multiple times until they get a good draw of judges, so we'd
+ have to somehow make this difficult or impossible.
+ Here's a few possible solutions.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Charge an application fee, either to the applicant, or perhaps some sponsor
+ in the club who submits the applicant for consideration.
+ Kelvin suggested perhaps the fee could be partially refunded if the app
+ is successful.
+ This could potentially limit re-application abuse while not being overly
+ costly for honest applicants.
+\end_layout
+
+\begin_layout Itemize
+Limit the number of applications per unique ``applicant''.
+ This depends on being able to identify applicants: i.e.
+ applicants can't just apply under new ``names''.
+ Unique identifiers might be possible in some settings, such as, for example,
+ judging whether an NFT-art deserves to be in a virtual gallery, and less
+ possible in other settings.
+ 
+\end_layout
+
+\begin_layout Itemize
+Do applications in ``rounds'', i.e.
+ there's a round of applications every few months or so.
+ This just means that failed applicants have to all wait a few months before
+ applying again.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+From chatting with Tina Zhen: RSMV probably is an attractive mechanism in
+ settings where an organization needs to make a large number of comparatively
+ small decisions: whether to admit members, or include artwork in a gallery,
+ or publish a paper.
+ RSMV tends to make mistakes for individual cases, but reflects the group's
+ preferences on average in a manner that's arguably smoother than full-group
+ majority voting.
+ The benefits in such settings may outweigh the costs of being wrong on
+ some individual cases.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+In settings where the group needs to make a small number of very big decisions
+ – for example, fork the project's code, or some other system-level change
+ – RSMV likely isn't a good fit, as the cost of a single mistake is quite
+ high.
+ This seems to explain which settings RSMV is used in classic cases
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+From a discussion with Wanran Zhao: RSMV could probably be combined with
+ budgeted-voting mechanisms, such as quadratic voting, to create, say, Random
+ Subset Quadratic Voting (RSQV).
+ This randomly selects a set of judges, and then has them quadratic-vote
+ on whether to admit the candidate.
+ This would have the benefit of getting preference-intensity information
+ from judges, so might be an interesting spin on the mechanism in some cases.
 \end_layout
 
 \end_body

@@ -112,6 +112,17 @@ Random Subset Majority Voting
 
 \begin_layout Author
 Anthony Lee Zhang
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+anthony.zhang@chicagobooth.edu.
+ Thanks to Wanran Zhao, CHECK FILL for comments.
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Date
@@ -542,20 +553,24 @@ end{center}
 \end_layout
 
 \begin_layout Standard
-When the threshold is lower, more types join.
+When the threshold is lower, the rectangle is wider: more extreme types
+ are able to join the club, because they only need the support of, say,
+ 20% or 35% of club members.
  But the admission probability plot is still a rectangle! It's still the
- case that you're either just above the cutoff, or just below.
+ case that every agent is either just above the cutoff where they get, say,
+ 35% of votes, or just below.
  We've succeeded in making admissions more permissive: but the cost is that
  extreme applicants close to the cutoffs, who are unacceptable to many existing
  applicants, have just as high a chance
 \emph on
  
 \emph default
-of getting in as moderate applicants!
+of getting in as very moderate applicants, who are acceptable to almost
+ everyone.
 \end_layout
 
 \begin_layout Standard
-A simple question: is there any voting rule, which:
+Our question, then: is there any voting rule, which:
 \end_layout
 
 \begin_layout Itemize
@@ -724,7 +739,7 @@ begin{center}
 \begin_inset Graphics
 	filename plots/sub_multi.png
 	lyxscale 30
-	width 40page%
+	width 60page%
 
 \end_inset
 
