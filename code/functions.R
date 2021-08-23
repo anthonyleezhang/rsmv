@@ -2,6 +2,7 @@
 library(data.table)
 library(ggplot2)
 library(scales)
+library(Cairo)
 
 reprow = function(x,n){
   matrix(rep(x,each=n),nrow=n)
@@ -19,3 +20,6 @@ rfun = function(n) {
 }
 
 
+d = function(...) {
+  print(paste(..., sep = ""))
+}

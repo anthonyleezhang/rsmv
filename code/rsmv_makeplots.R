@@ -1,7 +1,4 @@
 
-setwd('C:/Dropbox/projects/rsmv/code')
-rm(list = ls())
-
 source('set_plot_params.R')
 
 subsetdata = fread('../results/subsets_sumdata.csv')
@@ -89,23 +86,6 @@ fulldata = fread('../results/fullsample_data.csv')
 
 plotdata = fulldata[majshare == 0.5]
 
-# full50plot = ggplot(plotdata, aes(x = v, y = passrate)) + 
-#   geom_line(alpha = alphaparam, size = linesize) + 
-#   scale_x_continuous(name = TeX("$t_j$")) + 
-#   scale_y_continuous(name = TeX("Admit probability"), label = percent) +
-#   #scale_color_manual(name = '% cutoff', values = colorgrid) + 
-#   theme_bw() + 
-#   theme(text = element_text(size = textsize*2), 
-#         legend.text = element_text(size = legendtextsize*2),
-#         axis.text = element_text(size = axistextsize*2),
-#         #axis.title.y = element_text(angle = 0, vjust = 0.5),
-#         legend.position = 'none',
-#         legend.key.size = unit(5,"line"))
-# full50plot
-# 
-# CairoPNG(filename = paste("../plots/full_50.png", sep = ""), width = 1600, height = 1200)
-# print(full50plot)
-# dev.off()
 
 fulldata[, majsharefac := factor(majshare, levels = c(0.65, 0.5, 0.35, 0.2))]
 
@@ -247,24 +227,6 @@ dev.off()
 # Main plot subsets
 
 plotdata = subsetdata[subsetN == 5]
-# 
-# sub5plot = ggplot(plotdata, aes(x = v, y = passrate)) + 
-#   geom_line(alpha = alphaparam, size = linesize) + 
-#   scale_x_continuous(name = TeX("$t_j$")) + 
-#   scale_y_continuous(name = TeX("Admit probability"), label = percent) +
-#   #scale_color_manual(name = '% cutoff', values = colorgrid) + 
-#   theme_bw() + 
-#   theme(text = element_text(size = textsize*2), 
-#         legend.text = element_text(size = legendtextsize*2),
-#         axis.text = element_text(size = axistextsize*2),
-#         #axis.title.y = element_text(angle = 0, vjust = 0.5),
-#         legend.position = 'none',
-#         legend.key.size = unit(5,"line"))
-# sub5plot
-# 
-# CairoPNG(filename = paste("../plots/sub_5.png", sep = ""), width = 1600, height = 1200)
-# print(sub5plot)
-# dev.off()
 
 for(my_subsetN in c(3, 5, 11, 21, 41)) {
   

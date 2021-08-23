@@ -1,7 +1,4 @@
 
-setwd('C:/Dropbox/projects/rsmv/code')
-rm(list = ls())
-
 source('functions.R')
 
 distcutoff = 1
@@ -13,7 +10,6 @@ i = 1
 for(my_majshare in c(0.2, 0.35, 0.5, 0.65)) {
   
   d('MAJSHARE: ', my_majshare)
-  
   
   Tqres = 1000
   Tqgrid = (1:(Tqres-1))/Tqres

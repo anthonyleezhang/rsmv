@@ -1,7 +1,4 @@
 
-setwd('C:/Dropbox/projects/rsmv/code')
-rm(list = ls())
-
 source('functions.R')
 
 distcutoff = 1
